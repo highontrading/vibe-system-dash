@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - vibe-data:/data
+    ports:
+      - "8787:8787"
+
+  # HTTPS on your own domain. Start with: docker compose --profile https up -d
+  # (point your domain's DNS A record at the server first and set DOMAIN in .env)
+  caddy:
+    image: caddy:2
+    profiles: ["https"]
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      - app
+
+volumes:
+  vibe-data:
+  caddy-data:
